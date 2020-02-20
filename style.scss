@@ -2,6 +2,15 @@
 
 $font: 'Sriracha', cursive;
 
+@mixin styling() {
+  transition: 0.3s;
+  width: 15%;
+  display: inline-block;
+  border-radius: 10px;
+  background-color: white;
+  text-align: center;
+}
+
 html {
   height: 100%;
 }
@@ -25,29 +34,27 @@ html {
     border-width: 0 0 2px 0;
     border-radius: 5px 0 0 5px;
 
-    &--submit {
-      display: inline-block;
-      border: none;
-      width: 125px;
-      height: 55px;
-      border-radius: 0 5px 5px 0;
-      background-color: rgba(70, 80, 255);
-    }
 
   }
 }
 
+.main__submit {
+  display: inline-block;
+  border: none;
+  width: 125px;
+  height: 55px;
+  border-radius: 0 5px 5px 0;
+  background-color: rgba(70, 80, 255);
+}
+
 .maintwo {
 
+
   &__card {
-    transition: 0.3s;
+    @include styling;
+    margin-top: 150px;
     margin-bottom: 50px;
     margin-left: 10px;
-    width: 15%;
-    display: inline-block;
-    border-radius: 10px;
-    background-color: white;
-    text-align: center;
 
     &:hover {
       box-shadow: 0 8px 16px 0 rgba(6, 6, 6, 0.9);
@@ -65,3 +72,60 @@ html {
 }
 
 
+.position {
+  @include styling;
+  position: absolute;
+  left: 20px;
+  top: 10px;
+
+}
+
+.delete {
+  background-image: url("iconfinder_minus_1645995.png");
+  background-repeat: no-repeat;
+  border: none;
+  width: 60px;
+  height: 24px;
+  margin-left: 31px;
+  background-color: transparent;
+}
+
+[draggable] {
+  -moz-user-select: none;
+
+  -webkit-user-select: none;
+  user-select: none;
+  /* Required to make elements draggable in old WebKit */
+
+  -webkit-user-drag: element;
+}
+
+#columns {
+  list-style-type: none;
+}
+
+.column {
+  width: 162px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  text-align: center;
+  cursor: move;
+}
+.column header {
+  height: 20px;
+  width: 150px;
+  color: black;
+  background-color: #ccc;
+  padding: 5px;
+
+  border-radius: 10px;
+  border: 2px solid #666666;
+}
+
+.column.dragElem {
+  opacity: 0.4;
+}
+.column.over {
+  //border: 2px dashed #000;
+  border-top: 2px solid blue;
+}

@@ -2,74 +2,137 @@ function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
     } else {
-        console.log("i'm here")
+        alert("cant get location!!!!!")
     }
 }
 
+async function getCity(town) {
+    const url = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${town}&appid=800e8010067e6408327003c8fafc07e4&units=metric`);
+    return await url.json();
+}
 
-function fetchData(url) {
+function fetchData(url, local = false) {
     fetch(url)
-
         .then(function (response) {
             if (response.ok) {
                 response.json().then(function (data) {
-
-
-                    const div = document.createElement('div');
-                    div.classList.add("maintwo__card");
-                    const iconcode = data.weather[0].icon;
-                    const iconurl = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/" + iconcode + ".svg"; // icon url depending on weather discription
-                    const city = "<h4 class='naam'>" + data.name + ", " + data.sys.country + "</h4>";
-                    const img = "<img" + " src=" + iconurl + " + alt = 'dit is een foto' class='card__img img'>";
-
-                    const desc = "<p class='desc'>" + data.weather[0]["description"] + "</p>";
-                    var temp = "<p class='weer'>" + Math.round(data.main.temp) + "°C" + "</p>";
-
-                    div.innerHTML += img;
-                    div.innerHTML += temp;
-                    div.innerHTML += desc;
-                    div.innerHTML += city;
-
-                    return render(div);
+                    card(data, local);
                 });
             } else {
                 console.log("response failed");
             }
-
         });
+
+}
+
+function save(town) {
+    let towns = JSON.parse(window.localStorage.getItem("tow"));
+    if (!towns) {
+        towns = [];
+    }
+
+    if (towns.includes(town.toUpperCase())) {
+        alert("city is already added or doesn't exist")
+    } else {
+        towns.push(town.toUpperCase());
+    }
+
+    console.log(towns);
+    window.localStorage.setItem("tow", JSON.stringify(towns));
+
+}
+
+function loadItems() {
+    const items = JSON.parse(window.localStorage.getItem("tow"));
+
+
+    items.forEach(async function (town) {
+        const data = await getCity(town);
+        card(data);
+    });
+}
+
+async function deleteItem() {
+    document.addEventListener('click', function (e) {
+        if (e.target && e.target.id === 'delete') {
+
+
+            let towns = JSON.parse(window.localStorage.getItem("tow"));
+
+            if (!towns) {
+                towns = [];
+            }
+            e.target.parentNode.remove(); // to delete the div
+
+            let text = e.target.parentNode.getElementsByTagName("h4")[0];
+
+            towns = towns.filter(e => e !== text.innerText);
+
+            window.localStorage.setItem("tow", JSON.stringify(towns));
+        }
+    }, false);
+
 }
 
 function render(element) {
     return document.body.appendChild(element);
 }
 
-function showPosition(position) {
+function getInputData() {
+    document.querySelector('.main__submit').addEventListener("click", function () {
+
+        const town = document.getElementById('city').value;
+
+        save(town);
+    });
+
+}
+
+function draggable() {
+    document.addEventListener('ondrag', function (e) {
+        if (e.target && e.target.id === 'test') {
+            console.log(e);
+        }
+    });
+}
+
+
+function showPosition(position, local = true) {
     const key = '800e8010067e6408327003c8fafc07e4';
     const q = position.coords.latitude;
     const y = position.coords.longitude;
     const url = 'http://api.openweathermap.org/data/2.5/weather?lat=' + q + '&lon=' + y + '&appid=' + key + '&units=metric';
-    fetchData(url);
+    fetchData(url, local);
 }
 
-function geInputData() {
-    const key = '800e8010067e6408327003c8fafc07e4';
-    document.querySelector('.main__input--submit').addEventListener("click", function () {
-        const stad = document.getElementById('city').value;
-        const url = 'http://api.openweathermap.org/data/2.5/weather?q=' + stad + '&appid=' + key + '&units=metric';
 
-        fetchData(url);
+function card(data, local = false) {
 
-        // Put the object into storage
-        localStorage.setItem('opslaan', JSON.stringify(url));
-
-        // Retrieve the object from storage
-        var retrievedObject = localStorage.getItem('opslaan');
-
-        var persons = JSON.parse(retrievedObject);
+    const div = document.createElement('div');
+    const iconurl = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/" + data.weather[0].icon + ".svg"; // icon url depending on discription
 
 
-    });
+    div.innerHTML += "<img" + " src=" + iconurl + " + alt = 'dit is een foto' class='card__img img'>";
+    div.innerHTML += "<p class='weer'>" + Math.round(data.main.temp) + "°C" + "</p>";
+    div.innerHTML += "<p class='desc'>" + data.weather[0]["description"] + "</p>";
+    div.innerHTML += "<h4 class='naam' >" + data.name.toUpperCase() + "</h4>";
+
+    if (local) {
+        div.classList.add("position");
+        div.innerHTML += "<b>current location!</b>";
+
+    } else {
+
+        div.classList.add("maintwo__card");
+        div.setAttribute("draggable", 'true');
+        div.setAttribute("id", 'test');
+        div.innerHTML += "<input type='button' class='delete' id='delete'>";
+    }
+    return render(div);
 }
 
-geInputData();
+deleteItem();
+getInputData();
 getLocation();
+loadItems();
+

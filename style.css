@@ -22,7 +22,8 @@ html {
   border-width: 0 0 2px 0;
   border-radius: 5px 0 0 5px;
 }
-.main__input--submit {
+
+.main__submit {
   display: inline-block;
   border: none;
   width: 125px;
@@ -33,13 +34,14 @@ html {
 
 .maintwo__card {
   transition: 0.3s;
-  margin-bottom: 50px;
-  margin-left: 10px;
   width: 15%;
   display: inline-block;
   border-radius: 10px;
   background-color: white;
   text-align: center;
+  margin-top: 150px;
+  margin-bottom: 50px;
+  margin-left: 10px;
 }
 .maintwo__card:hover {
   box-shadow: 0 8px 16px 0 rgba(6, 6, 6, 0.9);
@@ -50,6 +52,66 @@ html {
 
 .card__container {
   padding: 2px 16px;
+}
+
+.position {
+  transition: 0.3s;
+  width: 15%;
+  display: inline-block;
+  border-radius: 10px;
+  background-color: white;
+  text-align: center;
+  position: absolute;
+  left: 20px;
+  top: 10px;
+}
+
+.delete {
+  background-image: url("iconfinder_minus_1645995.png");
+  background-repeat: no-repeat;
+  border: none;
+  width: 60px;
+  height: 24px;
+  margin-left: 31px;
+  background-color: transparent;
+}
+
+[draggable] {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Required to make elements draggable in old WebKit */
+  -webkit-user-drag: element;
+}
+
+#columns {
+  list-style-type: none;
+}
+
+.column {
+  width: 162px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  text-align: center;
+  cursor: move;
+}
+
+.column header {
+  height: 20px;
+  width: 150px;
+  color: black;
+  background-color: #ccc;
+  padding: 5px;
+  border-radius: 10px;
+  border: 2px solid #666666;
+}
+
+.column.dragElem {
+  opacity: 0.4;
+}
+
+.column.over {
+  border-top: 2px solid blue;
 }
 
 /*# sourceMappingURL=style.css.map */
