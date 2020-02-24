@@ -22,7 +22,6 @@ function fetchData(url, local = false) {
                 console.log("response failed");
             }
         });
-
 }
 
 function save(town) {
@@ -37,7 +36,7 @@ function save(town) {
         towns.push(town.toUpperCase());
     }
 
-    console.log(towns);
+
     window.localStorage.setItem("tow", JSON.stringify(towns));
 
 }
@@ -45,16 +44,17 @@ function save(town) {
 function loadItems() {
     const items = JSON.parse(window.localStorage.getItem("tow"));
 
-
     items.forEach(async function (town) {
         const data = await getCity(town);
+
         card(data);
+
     });
 }
 
 async function deleteItem() {
     document.addEventListener('click', function (e) {
-        if (e.target && e.target.id === 'delete') {
+        if (e.target && e.target.className === 'delete') {
 
 
             let towns = JSON.parse(window.localStorage.getItem("tow"));
@@ -62,11 +62,12 @@ async function deleteItem() {
             if (!towns) {
                 towns = [];
             }
+
             e.target.parentNode.remove(); // to delete the div
 
             let text = e.target.parentNode.getElementsByTagName("h4")[0];
 
-            towns = towns.filter(e => e !== text.innerText);
+            towns = towns.filter(e => e !== text.innerHTML);
 
             window.localStorage.setItem("tow", JSON.stringify(towns));
         }
@@ -85,13 +86,64 @@ function getInputData() {
 
         save(town);
     });
-
 }
 
 function draggable() {
-    document.addEventListener('ondrag', function (e) {
-        if (e.target && e.target.id === 'test') {
-            console.log(e);
+    document.addEventListener('mousedown', function (e) {
+        if (e.target && e.target.className === 'maintwo__card') {
+            (function () {
+
+                const elRoot = document.querySelector('.maintwo__card');
+
+                console.log("dfd");
+                // State variables
+                let isDragging = false;
+                let startX = null;
+                let startY = null;
+                let startLeft = null;
+                let startTop = null;
+
+                // Whenever mouse button is pressed
+                elRoot.addEventListener('mousedown', (e) => {
+                    const rect = elRoot.getBoundingClientRect();
+                    // Set component state to dragging
+                    isDragging = true;
+
+                    // Save mousedown coordinates
+                    startX = e.pageX;
+                    startY = e.pageY;
+
+                    // Save initial position values
+                    startLeft = rect.left;
+                    startTop = rect.top;
+                });
+
+                // Whenever mouse button is released
+                window.addEventListener('mouseup', () => {
+                    // Reset all state values and turn dragging mode off
+                    isDragging = false;
+                    startX = null;
+                    startY = null;
+                    startLeft = null;
+                    startTop = null;
+                });
+
+                // Whenever mouse is moved
+                window.addEventListener('mousemove', (e) => {
+                    // Do nothing if it's you're not in a dragging mode
+                    if (!isDragging) return;
+
+                    // Get the difference between current mouse cursor position and the mousedown position
+                    const deltaX = e.pageX - startX;
+                    const deltaY = e.pageY - startY;
+
+                    // Add the difference to initial card position
+                    // Event coordinates and card positions are stored separately because you can click somewhere inside the card,
+                    // but you need to know the top left coordinates of the card to move it either with top/left or with css transform.
+                    elRoot.style.left = `${startLeft + deltaX}px`;
+                    elRoot.style.top = `${startTop + deltaY}px`;
+                });
+            })();
         }
     });
 }
@@ -111,22 +163,18 @@ function card(data, local = false) {
     const div = document.createElement('div');
     const iconurl = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/" + data.weather[0].icon + ".svg"; // icon url depending on discription
 
-
-    div.innerHTML += "<img" + " src=" + iconurl + " + alt = 'dit is een foto' class='card__img img'>";
-    div.innerHTML += "<p class='weer'>" + Math.round(data.main.temp) + "°C" + "</p>";
-    div.innerHTML += "<p class='desc'>" + data.weather[0]["description"] + "</p>";
-    div.innerHTML += "<h4 class='naam' >" + data.name.toUpperCase() + "</h4>";
-
+    div.innerHTML += `<img src= ${iconurl}>
+                     <p class ='weer'> ${Math.round(data.main.temp)}°C</p>            
+                     <p class="desc"> ${data.weather[0]["description"]}</p>   
+                     <h4 class="naam">${data.name.toUpperCase()}</h4>   `;
     if (local) {
         div.classList.add("position");
-        div.innerHTML += "<b>current location!</b>";
-
+        div.innerHTML += "<b>huidige locatie!</b>";
     } else {
-
         div.classList.add("maintwo__card");
         div.setAttribute("draggable", 'true');
         div.setAttribute("id", 'test');
-        div.innerHTML += "<input type='button' class='delete' id='delete'>";
+        div.innerHTML += "<input type='button' class='delete'>";
     }
     return render(div);
 }
@@ -135,4 +183,5 @@ deleteItem();
 getInputData();
 getLocation();
 loadItems();
+draggable();
 
